@@ -28,7 +28,7 @@ public interface WalletRepository extends JpaRepository<Wallet, UUID> {
     Wallet findByUserIdAndCurrency(@Param("userId") long userId, @Param("currency") String currency);
 
     /**
-     * Use of updatedAT time to avoid race condition
+     * Use of version optimistic lock to avoid race condition
      * @param amount
      * @param uuid
      * @param updatedAt
@@ -36,8 +36,8 @@ public interface WalletRepository extends JpaRepository<Wallet, UUID> {
     @Modifying
     @Query(value = """
             UPDATE wallets 
-            SET balance = balance + :amount, updated_at = :updatedAt 
-            WHERE uuid = :uuid AND updated_at = :updatedAt
+            SET balance = balance + :amount, updated_at = :updatedAt, version = version + 1
+            WHERE uuid = :uuid AND version=:version
             """, nativeQuery = true)
-    int updateBalanceByUuid(@Param("amount") BigDecimal amount, @Param("uuid") UUID uuid, @Param("updatedAt") OffsetDateTime updatedAt);
+    int updateBalanceByUuid(@Param("amount") BigDecimal amount, @Param("uuid") UUID uuid, @Param("updatedAt") OffsetDateTime updatedAt, @Param("version") long version);
 }

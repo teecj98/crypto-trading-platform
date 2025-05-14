@@ -4,13 +4,15 @@ import com.teecj.crypto_trading_platform.auth.entities.User;
 import com.teecj.crypto_trading_platform.auth.services.CurrentUserService;
 import com.teecj.crypto_trading_platform.common.constant.Currency;
 import com.teecj.crypto_trading_platform.trade.models.WalletBalanceDTO;
-import com.teecj.crypto_trading_platform.trade.models.WalletDTO;
 import com.teecj.crypto_trading_platform.trade.services.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.teecj.crypto_trading_platform.trade.controllers.Api.GET_USER_WALLET_BALANCE;
 import static com.teecj.crypto_trading_platform.trade.controllers.Api.POST_CREATE_WALLET;

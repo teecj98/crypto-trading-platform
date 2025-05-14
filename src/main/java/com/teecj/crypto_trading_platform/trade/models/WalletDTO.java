@@ -10,9 +10,9 @@ import java.util.UUID;
 
 
 public record WalletDTO(UUID uuid, long userId, Currency currency, BigDecimal balance, OffsetDateTime createdAt,
-                        OffsetDateTime updatedAt) {
+                        OffsetDateTime updatedAt, long version) {
 
     public static WalletDTO fromWallet(Wallet wallet) throws WalletException {
-        return new WalletDTO(wallet.getUuid(), wallet.getUserId(), wallet.getCurrency(), wallet.getBalance(), wallet.getCreatedAt(), wallet.getUpdatedAt());
+        return new WalletDTO(wallet.getUuid(), wallet.getUserId(), wallet.getCurrency(), wallet.getBalance(), wallet.getCreatedAt(), wallet.getUpdatedAt(), wallet.getVersion());
     }
 }

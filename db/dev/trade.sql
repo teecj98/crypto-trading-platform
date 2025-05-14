@@ -7,8 +7,9 @@ CREATE TABLE wallets
     balance    NUMERIC(24, 6) DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    version    BIGINT         DEFAULT 0,
 
-    CONSTRAINT unique_wallets__user_id_crypto UNIQUE (user_id, currency),                             -- as index as well
+    CONSTRAINT unique_wallets__user_id_crypto UNIQUE (user_id, currency),                    -- as index as well
     CONSTRAINT fk_wallets_user_id_users_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
@@ -16,7 +17,7 @@ CREATE TABLE wallets
 CREATE TABLE transactions
 (
     uuid       UUID PRIMARY KEY,
-    type       VARCHAR(10)              NOT NULL CHECK (type in ('TRADE', 'DEPOSIT')),                 -- could have more types depending on the scope
+    type       VARCHAR(10)              NOT NULL CHECK (type in ('TRADE', 'DEPOSIT')),      -- could have more types depending on the scope
     status     VARCHAR(10)              NOT NULL CHECK (status in ('FAILED', 'FULFILLED')), -- could have more statuses depending on logic
     user_id    BIGINT                   NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -32,7 +33,7 @@ CREATE TABLE trades
     uuid             UUID PRIMARY KEY,
     type             VARCHAR(10)    NOT NULL CHECK (type in ('BUY', 'SELL')),
     symbol           VARCHAR(10)    NOT NULL CHECK (symbol IN ('ETHUSDT', 'BTCUSDT')), -- buy or sell symbol
-    amount           NUMERIC(19, 2) NOT NULL,                                           -- amount to buy or sell
+    amount           NUMERIC(19, 2) NOT NULL,                                          -- amount to buy or sell
     transaction_uuid UUID           NOT NULL,
 
     CONSTRAINT fk_trades_transaction_uuid_transactions_uuid FOREIGN KEY (transaction_uuid) REFERENCES transactions (uuid)

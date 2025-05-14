@@ -36,7 +36,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public WalletDTO createNewWallet(long userId, Currency currency) {
         OffsetDateTime now = OffsetDateTime.now();
-        Wallet wallet = new Wallet(UUID.randomUUID(), userId, currency, BigDecimal.ZERO, now, now);
+        Wallet wallet = new Wallet(UUID.randomUUID(), userId, currency, BigDecimal.ZERO, now, now, 0);
         Wallet saved = walletRepository.save(wallet);
         walletRepository.flush();
         logger.info("[Created new wallet]: {}", wallet);
@@ -68,7 +68,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public void updateWalletBalance(WalletBalanceUpdateDTO updateDTO) {
         BigDecimal amount = updateDTO.type() == OUT ? updateDTO.amount().negate() : updateDTO.amount();
-        int updatedNum = walletRepository.updateBalanceByUuid(amount, updateDTO.uuid(), updateDTO.lastUpdatedAt());
+        int updatedNum = walletRepository.updateBalanceByUuid(amount, updateDTO.uuid(), updateDTO.lastUpdatedAt(), updateDTO.version());
         if (updatedNum == 0) {
             throw WalletException.balanceUpdateOutdated("[update wallet balance] wallet uuid:" + updateDTO.uuid());
         }

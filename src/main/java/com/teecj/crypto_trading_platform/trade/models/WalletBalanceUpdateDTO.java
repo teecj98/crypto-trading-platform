@@ -6,5 +6,5 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record WalletBalanceUpdateDTO (UUID uuid, WalletStatementType type, BigDecimal amount, OffsetDateTime lastUpdatedAt) {
+public record WalletBalanceUpdateDTO (UUID uuid, WalletStatementType type, BigDecimal amount, OffsetDateTime lastUpdatedAt, long version) {
 }

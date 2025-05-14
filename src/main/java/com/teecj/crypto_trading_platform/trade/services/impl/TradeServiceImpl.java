@@ -57,9 +57,10 @@ public class TradeServiceImpl implements TradeService {
 
         // wallet to deduct
         WalletDTO deductWallet = walletService.findByUserIdAndCurrency(traderId, tradingDTO.deduct());
+        logger.info("deductWallet: {}", deductWallet);
         // wallet to deposit
         WalletDTO depositWallet = walletService.findByUserIdAndCurrency(traderId, tradingDTO.deposit());
-
+        logger.info("depositWallet: {}", depositWallet);
 
         // deduct
         // check if can deduct
@@ -71,14 +72,14 @@ public class TradeServiceImpl implements TradeService {
                     tradingDTO.deductAmount(), traderId, tradingDTO.symbol());
             throw WalletException.lowBalance("[perform trade] wallet uuid " + deductWallet.uuid());
         }
-        WalletBalanceUpdateDTO deductDto = new WalletBalanceUpdateDTO(deductWallet.uuid(), WalletStatementType.OUT, tradingDTO.deductAmount(), deductWallet.updatedAt());
+        WalletBalanceUpdateDTO deductDto = new WalletBalanceUpdateDTO(deductWallet.uuid(), WalletStatementType.OUT, tradingDTO.deductAmount(), deductWallet.updatedAt(), deductWallet.version());
         walletService.updateWalletBalance(deductDto);
 
         // deposit
         if (depositWallet == null)  {
             throw WalletException.walletNotFound("[perform trade] user has no wallet for trading deposit");
         }
-        WalletBalanceUpdateDTO depositDto = new WalletBalanceUpdateDTO(depositWallet.uuid(), WalletStatementType.IN, tradingDTO.depositAmount(), depositWallet.updatedAt());
+        WalletBalanceUpdateDTO depositDto = new WalletBalanceUpdateDTO(depositWallet.uuid(), WalletStatementType.IN, tradingDTO.depositAmount(), depositWallet.updatedAt(), depositWallet.version());
         walletService.updateWalletBalance(depositDto);
 
 

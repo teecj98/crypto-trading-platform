@@ -35,4 +35,7 @@ public class Wallet {
 
     private OffsetDateTime updatedAt;
 
+    @Version
+    long version;
+
 }

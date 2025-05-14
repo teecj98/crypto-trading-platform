@@ -26,4 +26,8 @@ public class PriceCalculator {
     public static BigDecimal findBestAsk(BigDecimal... asks) {
         return Collections.min(Arrays.asList(asks));
     }
+
+    public static BigDecimal calculateTradePrice(BigDecimal pricePerUnit, BigDecimal tradeAmount) {
+       return pricePerUnit.multiply(tradeAmount);
+    }
 }

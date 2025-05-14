@@ -36,11 +36,65 @@ public class TradeServiceImpl implements TradeService {
     private static final Logger logger = LoggerFactory.getLogger(TradeServiceImpl.class);
 
     private final TradeRepository tradeRepository;
+    private final TransactionRepository transactionRepository;
+
+    private final WalletService walletService;
+    private final WalletStatementService walletStatementService;
 
     @Autowired
-    public TradeServiceImpl(TradeRepository tradeRepository) {
+    public TradeServiceImpl(TradeRepository tradeRepository, TransactionRepository transactionRepository, WalletService walletService, WalletStatementService walletStatementService) {
         this.tradeRepository = tradeRepository;
+        this.transactionRepository = transactionRepository;
+        this.walletService = walletService;
+        this.walletStatementService = walletStatementService;
+    }
 
+
+    @Transactional
+    public void performTrade(TradingDTO tradingDTO, User user) throws WalletException {
+        long traderId = user.getId();
+        OffsetDateTime now = OffsetDateTime.now();
+
+        // wallet to deduct
+        WalletDTO deductWallet = walletService.findByUserIdAndCurrency(traderId, tradingDTO.deduct());
+        // wallet to deposit
+        WalletDTO depositWallet = walletService.findByUserIdAndCurrency(traderId, tradingDTO.deposit());
+
+
+        // deduct
+        // check if can deduct
+        if (deductWallet == null)  {
+            throw WalletException.walletNotFound("[perform trade] user has no wallet for trading deduct");
+        }
+        if (deductWallet.balance().compareTo(tradingDTO.deductAmount()) < 0) {
+            logger.info("[Trade] wallet to deduce has balance less than amount needed {}| traderId: {} | symbol: {}",
+                    tradingDTO.deductAmount(), traderId, tradingDTO.symbol());
+            throw WalletException.lowBalance("[perform trade] wallet uuid " + deductWallet.uuid());
+        }
+        WalletBalanceUpdateDTO deductDto = new WalletBalanceUpdateDTO(deductWallet.uuid(), WalletStatementType.OUT, tradingDTO.deductAmount(), deductWallet.updatedAt());
+        walletService.updateWalletBalance(deductDto);
+
+        // deposit
+        if (depositWallet == null)  {
+            throw WalletException.walletNotFound("[perform trade] user has no wallet for trading deposit");
+        }
+        WalletBalanceUpdateDTO depositDto = new WalletBalanceUpdateDTO(depositWallet.uuid(), WalletStatementType.IN, tradingDTO.depositAmount(), depositWallet.updatedAt());
+        walletService.updateWalletBalance(depositDto);
+
+
+        // add transaction records
+        Transaction transaction = new Transaction(UUID.randomUUID(), TransactionType.TRADE, TransactionStatus.FULFILLED, traderId, now);
+        transactionRepository.save(transaction);
+
+        BigDecimal tradeAmount = tradingDTO.type() == TradeType.BUY ? tradingDTO.depositAmount() : tradingDTO.deductAmount();
+        Trade trade = new Trade(UUID.randomUUID(), tradingDTO.type(), tradingDTO.symbol(), tradeAmount, transaction.getUuid());
+        tradeRepository.save(trade);
+
+        // add wallet statements
+        walletStatementService.create(new WalletStatementDTO(UUID.randomUUID(), deductWallet.uuid(), tradingDTO.deductAmount(), WalletStatementType.OUT, transaction.getUuid(), now));
+        walletStatementService.create(new WalletStatementDTO(UUID.randomUUID(), depositWallet.uuid(), tradingDTO.depositAmount(), WalletStatementType.IN, transaction.getUuid(), now));
+
+        logger.info("[Trade] Successfully performed trade {}", tradingDTO);
     }
 
 

@@ -8,5 +8,6 @@ public class Api {
     public static final String POST_CREATE_WALLET= "/api/v1/wallet/{currency}";
     public static final String GET_USER_WALLET_BALANCE= "/api/v1/wallet/{currency}/balance";
 
+    public static final String POST_TRADING= "/api/v1/trading/trade";
     public static final String GET_TRADING_HISTORY= "/api/v1/trading/history";
 }

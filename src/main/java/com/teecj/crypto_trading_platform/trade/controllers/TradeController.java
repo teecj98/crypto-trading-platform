@@ -2,7 +2,11 @@ package com.teecj.crypto_trading_platform.trade.controllers;
 
 import com.teecj.crypto_trading_platform.auth.entities.User;
 import com.teecj.crypto_trading_platform.auth.services.CurrentUserService;
+import com.teecj.crypto_trading_platform.trade.models.BuyTradeDTO;
+import com.teecj.crypto_trading_platform.trade.models.SellTradeDTO;
+import com.teecj.crypto_trading_platform.trade.models.TradeRequest;
 import com.teecj.crypto_trading_platform.trade.models.TradingHistoryDataDTO;
+import com.teecj.crypto_trading_platform.trade.services.BestBuySellTradingService;
 import com.teecj.crypto_trading_platform.trade.services.TradeService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -12,11 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.teecj.crypto_trading_platform.trade.controllers.Api.POST_TRADING;
 
 @RestController
 public class TradeController {
@@ -25,11 +30,13 @@ public class TradeController {
 
     private final CurrentUserService currentUserService;
     private final TradeService tradeService;
+    private final BestBuySellTradingService bestBuySellTradingService;
 
     @Autowired
-    public TradeController(CurrentUserService currentUserService, TradeService tradeService) {
+    public TradeController(CurrentUserService currentUserService, TradeService tradeService, BestBuySellTradingService bestBuySellTradingService) {
         this.currentUserService = currentUserService;
         this.tradeService = tradeService;
+        this.bestBuySellTradingService = bestBuySellTradingService;
     }
 
     /**
@@ -46,5 +53,24 @@ public class TradeController {
         return ResponseEntity.ok(tradeService.findTradeTransactions(currentUser.getId(), pageable));
     }
 
+    @PostMapping(POST_TRADING)
+    public ResponseEntity<String> doTradeRequest(@Validated @RequestBody TradeRequest request) {
+        User currentUser = currentUserService.getCurrentUser();
+        try {
+            switch (request.type()) {
+                case BUY ->
+                        bestBuySellTradingService.performBuyTrade(new BuyTradeDTO(request.symbol(), request.amount()), currentUser);
+                case SELL ->
+                        bestBuySellTradingService.performSellTrade(new SellTradeDTO(request.symbol(), request.amount()), currentUser);
+            }
 
+        } catch (Exception e) {
+            logger.error("[do trade request] Failed | userId: {} | {} ", currentUser.getId(), request, e);
+            return ResponseEntity.badRequest().build();
+        }
+
+        logger.info("[do trade request] Trade request completed | userId: {}", currentUser.getId());
+        return ResponseEntity.noContent().build();
+
+    }
 }

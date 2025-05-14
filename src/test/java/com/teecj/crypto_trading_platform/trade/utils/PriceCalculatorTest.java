@@ -23,7 +23,7 @@ class PriceCalculatorTest {
 
     @Test
     void findBestAsk_lowest() {
-        BigDecimal expectedLowest = new BigDecimal(0);
+        BigDecimal expectedLowest = new BigDecimal("0.2");
         BigDecimal actual = PriceCalculator.findBestAsk(
                 expectedLowest,
                 new BigDecimal(1123),
@@ -33,4 +33,16 @@ class PriceCalculatorTest {
 
         Assertions.assertEquals(expectedLowest, actual);
     }
+
+    @Test
+    void calculatePrice() {
+        BigDecimal price = new BigDecimal("103340.50");
+        BigDecimal amount = new BigDecimal("0.012");
+
+        BigDecimal expected = new BigDecimal("1240.086");
+        BigDecimal actual = PriceCalculator.calculateTradePrice(price, amount);
+
+        Assertions.assertTrue(expected.compareTo(actual) == 0);
+    }
+
 }

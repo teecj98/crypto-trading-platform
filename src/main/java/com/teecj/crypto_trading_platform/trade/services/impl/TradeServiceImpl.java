@@ -65,7 +65,7 @@ public class TradeServiceImpl implements TradeService {
         // deduct
         // check if can deduct
         if (deductWallet == null)  {
-            throw WalletException.walletNotFound("[perform trade] user has no wallet for trading deduct");
+            throw WalletException.walletNotFound("[perform trade] user has no wallet for " + tradingDTO.deduct());
         }
         if (deductWallet.balance().compareTo(tradingDTO.deductAmount()) < 0) {
             logger.info("[Trade] wallet to deduce has balance less than amount needed {}| traderId: {} | symbol: {}",
@@ -77,7 +77,7 @@ public class TradeServiceImpl implements TradeService {
 
         // deposit
         if (depositWallet == null)  {
-            throw WalletException.walletNotFound("[perform trade] user has no wallet for trading deposit");
+            throw WalletException.walletNotFound("[perform trade] user has no wallet for " + tradingDTO.deposit());
         }
         WalletBalanceUpdateDTO depositDto = new WalletBalanceUpdateDTO(depositWallet.uuid(), WalletStatementType.IN, tradingDTO.depositAmount(), depositWallet.updatedAt(), depositWallet.version());
         walletService.updateWalletBalance(depositDto);

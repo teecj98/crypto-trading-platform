@@ -2,6 +2,7 @@ package com.teecj.crypto_trading_platform.trade.controllers;
 
 import com.teecj.crypto_trading_platform.auth.entities.User;
 import com.teecj.crypto_trading_platform.auth.services.CurrentUserService;
+import com.teecj.crypto_trading_platform.trade.error.ErrorCodeException;
 import com.teecj.crypto_trading_platform.trade.error.TradingException;
 import com.teecj.crypto_trading_platform.trade.error.WalletException;
 import com.teecj.crypto_trading_platform.trade.models.BuyTradeDTO;
@@ -67,7 +68,7 @@ public class TradeController {
             }
 
         }
-        catch (WalletException | TradingException e) {
+        catch (ErrorCodeException e) {
             logger.error("[do trade request] Failed | userId: {} | {} ", currentUser.getId(), request, e);
             return ResponseEntity.badRequest().body(e.getCode());
         } catch (Exception e) {

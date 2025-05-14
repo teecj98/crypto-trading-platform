@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class WebClientIT {
 
     private static final Logger logger = LoggerFactory.getLogger(WebClientIT.class);

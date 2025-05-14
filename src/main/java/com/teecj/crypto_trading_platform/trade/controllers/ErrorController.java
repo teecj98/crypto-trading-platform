@@ -1,5 +1,6 @@
 package com.teecj.crypto_trading_platform.trade.controllers;
 
+import com.teecj.crypto_trading_platform.trade.error.ErrorCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,14 +12,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ErrorController {
     private final Logger log = LoggerFactory.getLogger(ErrorController.class);
 
-    private final static String ERROR_500 = "UNKNOWN_ERROR";
+    private final static String GENERIC_ERROR = "GENERIC_ERROR";
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    public ResponseEntity<String> handleException(Exception e) {
         log.error("[EXCEPTION ERROR] message: {}", e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ERROR_500));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(GENERIC_ERROR);
     }
 
-    public record ErrorResponse(String message) {
+    @ExceptionHandler(ErrorCodeException.class)
+    public ResponseEntity<String> handleErrorCodeException(ErrorCodeException e) {
+        log.error("[Eror COde EXCEPTION] code: {} | message: {}", e.getCode(), e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getCode());
     }
+
 }

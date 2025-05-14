@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class WebClientTest {
 
     private final BinanceWebClient binanceWebClient;

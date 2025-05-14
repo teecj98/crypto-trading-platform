@@ -15,12 +15,10 @@ import com.teecj.crypto_trading_platform.trade.repositories.TransactionRepositor
 import com.teecj.crypto_trading_platform.trade.services.TradeService;
 import com.teecj.crypto_trading_platform.trade.services.WalletService;
 import com.teecj.crypto_trading_platform.trade.services.WalletStatementService;
-import org.hibernate.boot.model.source.spi.Sortable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +55,8 @@ public class TradeServiceImpl implements TradeService {
 
         // wallet to deduct
         WalletDTO deductWallet = walletService.findByUserIdAndCurrency(traderId, tradingDTO.deduct());
-        logger.info("deductWallet: {}", deductWallet);
         // wallet to deposit
         WalletDTO depositWallet = walletService.findByUserIdAndCurrency(traderId, tradingDTO.deposit());
-        logger.info("depositWallet: {}", depositWallet);
 
         // deduct
         // check if can deduct

@@ -31,6 +31,7 @@ public class AggregatedPriceServiceImpl implements AggregatedPriceService {
     @Override
     public AggregatedPriceDTO getAggregatedPrice(Symbol symbol) {
         Optional<AggregatedPrice> optional = aggregatedPriceRepository.findById(symbol);
+        logger.info("[Aggregated price] Cache miss, Perform query");
         return optional.map(AggregatedPriceDTO::fromAggregatedPrice).orElse(null);
     }
 
